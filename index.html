@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My first dapp</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div id="call-response" class="alert alert-info hidden">
+        <h1>Response</h1>
+        <p id="response-message"></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1>dApp</h1>
+        <div id="content">
+          <h4>calling <code>contract.hello()</code> -> "<strong id="hello"></strong>"</h4>
+        </div>
+        <form role="form">
+          <div class="form-group" style="display:inline;">
+            <div class="input-group">
+              <input class="form-control input-lg" name="message"></input>
+              <span class="input-group-btn">
+                  <button type="submit" class="btn btn-primary btn-lg">Change message</button>
+              </span>
+            </div>
+          </div>
+        </form>
+        </hr>
+        <h3>Transaction Log</h3>
+        <p id="log"></p>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+
+  <script>
+    // Initialize Web3
+    if (typeof web3 !== 'undefined') {
+      web3 = new Web3(web3.currentProvider);
+    } else {
+      // set the provider you want from Web3.providers
+      web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+    }
+
+    // Set Account to use
+    web3.eth.defaultAccount = web3.eth.accounts[0];
+
+    // Set Contract Abi (grab it on remix)
+    var contractAbi = [{
+        "constant": false,
+        "inputs": [{
+          "name": "_message",
+          "type": "string"
+        }],
+        "name": "setName",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [],
+        "name": "hello",
+        "outputs": [{
+          "name": "",
+          "type": "string"
+        }],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ];
+
+    // Set Contract Address
+    var contractAddress = '0x4e1e0cd2a015887d60aa12f68802719472c18e6e';
+
+    // Set the Contract
+    var contract = web3.eth.contract(contractAbi).at(contractAddress);
+
+    var showHello = function() {
+      //call hello message and display
+      contract.hello(function(error, result) {
+        if (error) {
+          console.log("contract.setName() ERROR -> " + error);
+        }
+        $('#hello').html(result);
+        console.log("contract.setName() -> " + result);
+      });
+    };
+
+    showHello();
+
+    // Change the message
+    $('form').on('submit', function(event) {
+      event.preventDefault();
+
+      var name = $('input').val();
+
+      contract.setName(name, function(error, result) {
+        if (error) {
+          console.log(error);
+          $("#call-response").show();
+          return $("#response-message").html("There was an error calling contract: " + error);
+        } else {
+          console.log("contract.setName() -> " + result);
+
+          $("#call-response").show();
+          showHello();
+
+          $('input').val('');
+          return $("#response-message").html("tx hash: " + result);
+        }
+      });
+    });
+
+    // listen for the latest transactions being mined
+    var filter = web3.eth.filter('latest');
+    // watch for changes
+    filter.watch(function(error, result) {
+      if (!error) {
+        console.log('watch latest -> ' + result);
+        showHello();
+        $('#log').append(result + "<br/>");
+      } else {
+        console.log('watch ERROR -> ' + error)
+      }
+    });
+  </script>
+</body>
+
+</html>
