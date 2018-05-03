@@ -17,6 +17,23 @@ You can see more examples of contracts [here](https://github.com/ConsenSys/Token
 - Deploy with remix
 - The file `index.html` is a *very limited and simple* example on how to create a page to interact with your hello-world contract using [web3.js](https://github.com/ethereum/web3.js/). Use it just for testing purposes.
 
+
+### To run a simple http-server
+PS: To run a simple http-server to serve your html file `index.html`, you can simply [install npm](https://treehouse.github.io/installation-guides/mac/node-mac.html), clone the repository, and run:
+```
+$ cd meetup-01-smart-contracts
+$ npm install http-server -g
+$ http-server .
+
+> Starting up http-server, serving .
+> Available on:
+>   http://127.0.0.1:8080
+>   http://192.168.0.13:8080
+> Hit CTRL-C to stop the server
+```
+
+Then open [http://127.0.0.1:8080](http://127.0.0.1:8080) on chrome/firefox, and **make sure metamask is installed and running on the rinkeby network in the same browser**.
+
 # Implement the ERC20 token interface/standard
 
 [ERC20 Token Standard](https://theethereum.wiki/w/index.php/ERC20_Token_Standard)
